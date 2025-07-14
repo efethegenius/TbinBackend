@@ -97,7 +97,7 @@ class PaymentsService {
 
       const mailOptions = {
         from: "abimbola@thebridgeinternationalnetwork.com",
-        to: "forbesbrained@gmail.com",
+        to: "Thebridgeinternationalnetwork@gmail.com",
         subject: "Hello from Zoho",
         html: "<h1>This is from your app</h1>",
       };

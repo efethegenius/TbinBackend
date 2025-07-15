@@ -21,7 +21,12 @@ const PORT = process.env.PORT || 3001;
 
 // Security middleware
 app.use(helmet());
-const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://68764236a96401379436a60f--tbinapp.netlify.app/",
+  "https://tbinapp.netlify.app/",
+];
 
 app.use(
   cors({

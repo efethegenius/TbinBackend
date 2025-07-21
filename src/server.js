@@ -43,7 +43,8 @@ const corsOptions = {
         (allowedOrigin) =>
           origin === allowedOrigin ||
           origin.startsWith(allowedOrigin.replace("https://", "https://")) ||
-          origin.endsWith(".netlify.app") // Allow all Netlify preview deployments
+          origin.endsWith(".netlify.app") || // Allow all Netlify preview deployments
+          origin.endsWith(".api.io") // Allow all Netlify preview deployments
       )
     ) {
       return callback(null, true);

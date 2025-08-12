@@ -319,6 +319,79 @@ class ProjectService {
         // Don't throw here as the project update succeeded
       }
 
+      const approvemail = ` 
+      <div style="font-family: Arial, sans-serif; background-color: #f4faff; padding: 20px; border-radius: 8px; border: 1px solid #cce4f7; max-width: 500px; margin: auto;">
+  <h2 style="color: #2b7bb9; text-align: center;">🎉 Project Approved!</h2>
+  <p style="color: #333; font-size: 14px; line-height: 1.6;">
+    Hi <strong>{{userName}}</strong>,<br><br>
+    Great news! Your project <strong>"{{projectName}}"</strong> has been successfully approved by our review team.  
+    You can now proceed to the next stage and start reaping the benefits of your hard work.
+  </p>
+
+  <p style="color: #333; font-size: 14px; line-height: 1.6;">
+    📅 Approval Date: <strong>{{approvalDate}}</strong><br>
+    ✅ Status: <strong>Approved</strong>
+  </p>
+
+  <a href="{{projectLink}}" style="display: inline-block; padding: 10px 15px; background-color: #2b7bb9; color: white; text-decoration: none; border-radius: 5px; font-size: 14px;">
+    View Project
+  </a>
+
+  <p style="margin-top: 20px; color: #555; font-size: 12px;">
+    Thank you for trusting us. We’re excited to see your project make an impact!  
+    If you have any questions, feel free to contact our support team.
+  </p>
+</div>
+      `;
+
+      const deniedMail = `<div style="font-family: Arial, sans-serif; background-color: #fff4f4; padding: 20px; border-radius: 8px; border: 1px solid #f5cccc; max-width: 500px; margin: auto;">
+  <h2 style="color: #cc0000; text-align: center;">❌ Project Denied</h2>
+  <p style="color: #333; font-size: 14px; line-height: 1.6;">
+    Hi <strong>{{userName}}</strong>,<br><br>
+    Unfortunately, your project <strong>"{{projectName}}"</strong> did not meet our current requirements for approval.  
+    We encourage you to review the feedback and make necessary adjustments before reapplying.
+  </p>
+
+  <p style="color: #333; font-size: 14px; line-height: 1.6;">
+    📅 Review Date: <strong>{{reviewDate}}</strong><br>
+    ⚠️ Status: <strong>Denied</strong>
+  </p>
+
+  <div style="margin: 15px 0; padding: 10px; background-color: #ffe6e6; border-radius: 5px; font-size: 13px; color: #990000;">
+    <strong>Reason:</strong> {{denialReason}}
+  </div>
+
+  <a href="{{guidelinesLink}}" style="display: inline-block; padding: 10px 15px; background-color: #cc0000; color: white; text-decoration: none; border-radius: 5px; font-size: 14px;">
+    Review Guidelines
+  </a>
+
+  <p style="margin-top: 20px; color: #555; font-size: 12px;">
+    We appreciate the effort you put into your submission. Please take the time to review and improve your project — we’d love to see you try again!
+  </p>
+</div>`;
+
+      const transporter = nodemailer.createTransport({
+        host: "smtp.zoho.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: "abimbola@thebridgeinternationalnetwork.com",
+          pass: "gzH3VDbSp7BL",
+        },
+      });
+
+      const mailOptions = {
+        from: "abimbola@thebridgeinternationalnetwork.com",
+        to: email,
+        subject: "Thank you for your donation!",
+        html: statusData.status === "approved" ? approvemail : deniedMail,
+      };
+
+      if (statusData.status === "approved" || statusData.status === "denied") {
+        const mailRes = await transporter.sendMail(mailOptions);
+        console.log("Mail sent:", mailRes);
+      }
+
       return project;
     } catch (error) {
       console.error("Error updating project status:", error);

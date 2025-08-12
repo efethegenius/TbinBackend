@@ -8,6 +8,7 @@ import DonationController from "../controllers/DonationController.js";
 import ReportsController from "../controllers/ReportsController.js";
 import DashboardController from "../controllers/DashboardController.js";
 import PaymentsController from "../controllers/PaymentController.js";
+import PartnershipController from "../controllers/PartnershipController.js";
 
 const router = express.Router();
 
@@ -272,5 +273,44 @@ router.post(
 
 // Dashboard Routes
 router.get("/overview", DashboardController.getOverview);
+
+// Partnership Application Routes
+router.get(
+  "/partnerships",
+  [
+    query("page").optional().isInt({ min: 1 }),
+    query("limit").optional().isInt({ min: 1, max: 100 }),
+    query("status")
+      .optional()
+      .isIn(["pending", "under_review", "approved", "rejected"]),
+    query("search").optional().isString().trim(),
+  ],
+  PartnershipController.getAllApplications
+);
+
+router.get("/partnerships/stats", PartnershipController.getApplicationStats);
+
+router.get(
+  "/partnerships/:id",
+  [param("id").isString().notEmpty()],
+  PartnershipController.getApplicationById
+);
+
+router.patch(
+  "/partnerships/:id/status",
+  [
+    param("id").isString().notEmpty(),
+    body("status")
+      .isIn(["pending", "under_review", "approved", "rejected"])
+      .withMessage("Invalid status"),
+  ],
+  PartnershipController.updateApplicationStatus
+);
+
+router.delete(
+  "/partnerships/:id",
+  [param("id").isString().notEmpty()],
+  PartnershipController.deleteApplication
+);
 
 export default router;

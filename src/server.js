@@ -9,6 +9,7 @@ import { dirname } from "path";
 // Import routes
 import authRoutes from "./routes/auth.js";
 import adminRoutes from "./routes/admin.js";
+import partnershipRoutes from "./routes/partnerships.js";
 
 // Load environment variables
 dotenv.config();
@@ -74,6 +75,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/partnerships", partnershipRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

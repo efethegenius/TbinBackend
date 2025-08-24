@@ -1,4 +1,5 @@
 import supabase from "../config/supabase.js";
+import nodemailer from "nodemailer";
 
 class ProjectService {
   static async getAllProjects({ page, limit, status, search }) {
@@ -281,7 +282,7 @@ class ProjectService {
     }
   }
 
-  static async updateProjectStatus(id, statusData) {
+  static async updateProjectStatus(id, statusData, email) {
     try {
       // Start a transaction
       const { data: project, error: projectError } = await supabase
@@ -319,17 +320,19 @@ class ProjectService {
         // Don't throw here as the project update succeeded
       }
 
+      console.log("this is project: ", project);
+
       const approvemail = ` 
       <div style="font-family: Arial, sans-serif; background-color: #f4faff; padding: 20px; border-radius: 8px; border: 1px solid #cce4f7; max-width: 500px; margin: auto;">
   <h2 style="color: #2b7bb9; text-align: center;">🎉 Project Approved!</h2>
   <p style="color: #333; font-size: 14px; line-height: 1.6;">
-    Hi <strong>{{userName}}</strong>,<br><br>
-    Great news! Your project <strong>"{{projectName}}"</strong> has been successfully approved by our review team.  
+    Hi There,<br><br>
+    Great news! Your project <strong>"${project.title}"</strong> has been successfully approved by our review team.  
     You can now proceed to the next stage and start reaping the benefits of your hard work.
   </p>
 
   <p style="color: #333; font-size: 14px; line-height: 1.6;">
-    📅 Approval Date: <strong>{{approvalDate}}</strong><br>
+    📅 Approval Date: <strong>${new Date()}</strong><br>
     ✅ Status: <strong>Approved</strong>
   </p>
 
@@ -347,23 +350,15 @@ class ProjectService {
       const deniedMail = `<div style="font-family: Arial, sans-serif; background-color: #fff4f4; padding: 20px; border-radius: 8px; border: 1px solid #f5cccc; max-width: 500px; margin: auto;">
   <h2 style="color: #cc0000; text-align: center;">❌ Project Denied</h2>
   <p style="color: #333; font-size: 14px; line-height: 1.6;">
-    Hi <strong>{{userName}}</strong>,<br><br>
-    Unfortunately, your project <strong>"{{projectName}}"</strong> did not meet our current requirements for approval.  
+    Hi There,<br><br>
+    Unfortunately, your project <strong>"${project.title}"</strong> did not meet our current requirements for approval.  
     We encourage you to review the feedback and make necessary adjustments before reapplying.
   </p>
 
   <p style="color: #333; font-size: 14px; line-height: 1.6;">
-    📅 Review Date: <strong>{{reviewDate}}</strong><br>
+    📅 Review Date: <strong>${new Date()}</strong><br>
     ⚠️ Status: <strong>Denied</strong>
   </p>
-
-  <div style="margin: 15px 0; padding: 10px; background-color: #ffe6e6; border-radius: 5px; font-size: 13px; color: #990000;">
-    <strong>Reason:</strong> {{denialReason}}
-  </div>
-
-  <a href="{{guidelinesLink}}" style="display: inline-block; padding: 10px 15px; background-color: #cc0000; color: white; text-decoration: none; border-radius: 5px; font-size: 14px;">
-    Review Guidelines
-  </a>
 
   <p style="margin-top: 20px; color: #555; font-size: 12px;">
     We appreciate the effort you put into your submission. Please take the time to review and improve your project — we’d love to see you try again!
@@ -387,7 +382,10 @@ class ProjectService {
         html: statusData.status === "approved" ? approvemail : deniedMail,
       };
 
-      if (statusData.status === "approved" || statusData.status === "denied") {
+      if (
+        statusData.status === "approved" ||
+        statusData.status === "disabled"
+      ) {
         const mailRes = await transporter.sendMail(mailOptions);
         console.log("Mail sent:", mailRes);
       }

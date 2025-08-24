@@ -208,16 +208,22 @@ class ProjectController {
       }
 
       const { id } = req.params;
-      const { status, reason } = req.body;
+      console.log(id);
+
+      const { status, reason, email } = req.body;
 
       console.log("id", id);
 
-      const updatedProject = await ProjectService.updateProjectStatus(id, {
-        status,
-        reason,
-        reviewedBy: "",
-        reviewedAt: new Date(),
-      });
+      const updatedProject = await ProjectService.updateProjectStatus(
+        id,
+        {
+          status,
+          reason,
+          reviewedBy: "",
+          reviewedAt: new Date(),
+        },
+        email
+      );
 
       if (!updatedProject) {
         return res.status(404).json({
